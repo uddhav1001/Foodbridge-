@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodBridge — Smart Surplus Food Redistribution Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #00ff88;
+            --blue: #00b4d8;
+            --dark: #0a0a0f;
+            --card: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e0;
+            --muted: #888;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark);
+            color: var(--text);
+            line-height: 1.7;
+            padding: 0;
+        }
+
+        /* ===== COVER PAGE ===== */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0a0a0f 0%, #0d1f1a 50%, #0a0a0f 100%);
+            padding: 60px 40px;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(0,255,136,0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 60%, rgba(0,180,216,0.04) 0%, transparent 50%);
+        }
+
+        .cover-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            border: 1px solid var(--green);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--green);
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .cover h1 {
+            font-size: 64px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .cover h1 .emoji {
+            -webkit-text-fill-color: initial;
+        }
+
+        .cover .subtitle {
+            font-size: 22px;
+            color: var(--muted);
+            font-weight: 300;
+            max-width: 600px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .cover-meta {
+            position: relative;
+            display: flex;
+            gap: 32px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cover-meta span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--muted);
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        /* ===== PAGE LAYOUT ===== */
+        .page {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 50px;
+            page-break-after: always;
+        }
+
+        .page:last-child { page-break-after: avoid; }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--green);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        h2 .accent {
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-desc {
+            color: var(--muted);
+            font-size: 15px;
+            margin-bottom: 36px;
+            max-width: 700px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            margin: 28px 0 14px;
+        }
+
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .card-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            transition: all 0.2s;
+        }
+
+        .card:hover { border-color: rgba(0,255,136,0.3); }
+
+        .card .icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .card h4 {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 28px;
+            font-size: 14px;
+        }
+
+        thead th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--green);
+            border-bottom: 2px solid var(--border);
+            font-weight: 600;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        tbody tr:hover { background: rgba(0,255,136,0.02); }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: rgba(0,255,136,0.08);
+            color: var(--green);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* ===== BADGE TAGS ===== */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tag-green { background: rgba(0,255,136,0.12); color: var(--green); }
+        .tag-blue { background: rgba(0,180,216,0.12); color: var(--blue); }
+        .tag-yellow { background: rgba(255,200,0,0.12); color: #ffc800; }
+        .tag-purple { background: rgba(160,100,255,0.12); color: #a064ff; }
+
+        /* ===== LISTS ===== */
+        ul, ol {
+            margin: 12px 0 12px 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        li strong {
+            color: #fff;
+        }
+
+        /* ===== FLOW DIAGRAM ===== */
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 28px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 20px;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .flow-item .flow-icon { font-size: 24px; margin-bottom: 4px; }
+        .flow-item .flow-label { font-size: 12px; font-weight: 600; color: #fff; }
+        .flow-item .flow-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: var(--green);
+            margin: 0 6px;
+        }
+
+        /* ===== TECH STACK PILLS ===== */
+        .pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .pill {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .pill .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .dot-green { background: var(--green); }
+        .dot-blue { background: var(--blue); }
+        .dot-yellow { background: #ffc800; }
+        .dot-purple { background: #a064ff; }
+        .dot-red { background: #ff4466; }
+
+        /* ===== STATS ROW ===== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .stat-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-box .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-box .stat-label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 36px 0;
+        }
+
+        /* ===== HIGHLIGHT BOX ===== */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0,255,136,0.06), rgba(0,180,216,0.06));
+            border: 1px solid rgba(0,255,136,0.15);
+            border-radius: 14px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--green);
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body { background: var(--dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .cover { min-height: 100vh; }
+            .page { padding: 40px 40px; }
+            .card:hover { border-color: var(--border); }
+        }
+
+        /* ===== FOOTER ===== */
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== COVER PAGE ==================== -->
+    <div class="cover">
+        <div class="cover-badge">Track 1 · Zero Hunger</div>
+        <h1><span class="emoji">🌉</span> FoodBridge</h1>
+        <p class="subtitle">Smart Surplus Food Redistribution Platform — Connecting Donors, Volunteers & Shelters to End Food Waste</p>
+        <div class="cover-meta">
+            <span>📅 September 2026</span>
+            <span>🛠 MERN Stack</span>
+            <span>☁️ MongoDB Atlas</span>
+            <span>⚡ Real-time</span>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 1: PROBLEM & SOLUTION ==================== -->
+    <div class="page">
+        <div class="section-number">01 — The Problem</div>
+        <h2>Food Waste is a <span class="accent">Crisis</span></h2>
+        <p class="section-desc">Every day, millions of meals are wasted at restaurants, messes, and events — while millions go hungry. The disconnect between surplus food and those in need costs lives and harms our planet.</p>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-value">1/3</div>
+                <div class="stat-label">Food Produced Wasted</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">828M</div>
+                <div class="stat-label">People Go Hungry</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">8-10%</div>
+                <div class="stat-label">Global GHG from Waste</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">$1T+</div>
+                <div class="stat-label">Economic Loss/Year</div>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-number">Our Solution</div>
+        <h2><span class="accent">FoodBridge</span> — The Smart Link</h2>
+        <p class="section-desc">A real-time platform that intelligently connects surplus food donors with verified shelters through optimized volunteer networks — with built-in safety, forecasting, and accountability.</p>
+
+        <div class="flow">
+            <div class="flow-item">
+                <div class="flow-icon">🏪</div>
+                <div class="flow-label">Donor</div>
+                <div class="flow-sub">Lists surplus</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-item" style="border-color: rgba(0,255,136,0.3);">
+                <div class="flow-icon">🤖</div>
+                <div class="flow-label">FoodBridge AI</div>
+                <div class="flow-sub">Match + Optimize</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-item">
+                <div class="flow-icon">🚗</div>
+                <div class="flow-label">Volunteer</div>
+                <div class="flow-sub">Picks up via route</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-item">
+                <div class="flow-icon">🏠</div>
+                <div class="flow-label">Shelter</div>
+                <div class="flow-sub">Receives food</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 2: CORE FEATURES ==================== -->
+    <div class="page">
+        <div class="section-number">02 — Core Features</div>
+        <h2>What <span class="accent">FoodBridge</span> Does</h2>
+        <p class="section-desc">Six pillars of the platform — each solving a real-world challenge in food redistribution.</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="icon">📊</div>
+                <h4>Demand Forecasting</h4>
+                <p>Moving-average algorithm predicts surplus per donor using historical data — shelters can plan meals 7 days ahead.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🗺️</div>
+                <h4>Route Optimization</h4>
+                <p>Batches multiple pickups into one efficient trip using nearest-neighbor algorithm — saves fuel and time for volunteers.</p>
+            </div>
+            <div class="card">
+                <div class="icon">✅</div>
+                <h4>Verified NGO Onboarding</h4>
+                <p>Document upload, admin review, approval workflow, and community rating system ensures only trusted shelters participate.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🛡️</div>
+                <h4>Food Safety Automation</h4>
+                <p>Photo-based freshness checks at handover with color-coded badges (Fresh / Caution / Expired) and expiry countdown timers.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📈</div>
+                <h4>Impact & CSR Reporting</h4>
+                <p>Auto-generated monthly reports — meals saved, CO₂ avoided, per-donor breakdown. Downloadable for CSR and tax filing.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🌐</div>
+                <h4>Multilingual & SMS Access</h4>
+                <p>i18n support (English, Hindi, and more). SMS alerts for small shelters without smartphones via simulated Twilio integration.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 3: ADVANCED CONCEPTS ==================== -->
+    <div class="page">
+        <div class="section-number">03 — Advanced Concepts</div>
+        <h2>What Makes Us <span class="accent">Stand Out</span></h2>
+        <p class="section-desc">Eight advanced technical implementations that elevate FoodBridge beyond a basic CRUD app.</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h4>Real-time Socket.IO</h4>
+                <p>Live push notifications when donations are created, claimed, or delivered. Zero page refresh needed.</p>
+                <div style="margin-top:8px;"><span class="tag tag-green">WebSocket</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">📱</div>
+                <h4>QR Code Handover</h4>
+                <p>Unique QR per donation — scanned at pickup & delivery for tamper-proof chain of custody verification.</p>
+                <div style="margin-top:8px;"><span class="tag tag-blue">Security</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">🧠</div>
+                <h4>Smart Matching Algorithm</h4>
+                <p>Auto-match surplus to nearest shelter using proximity (MongoDB 2dsphere), capacity, and dietary compatibility.</p>
+                <div style="margin-top:8px;"><span class="tag tag-purple">AI/ML</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">🏆</div>
+                <h4>Gamification & Leaderboard</h4>
+                <p>Points, achievement badges (First Donation, 100 Meals, Speed Demon), and ranked leaderboards per role.</p>
+                <div style="margin-top:8px;"><span class="tag tag-yellow">Engagement</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">📍</div>
+                <h4>Geo-Proximity Alerts</h4>
+                <p>Auto-notify volunteers within configurable radius when new donations appear. Uses MongoDB geospatial indexing.</p>
+                <div style="margin-top:8px;"><span class="tag tag-green">Geospatial</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">🔥</div>
+                <h4>Interactive Heatmap</h4>
+                <p>Leaflet heatmap overlay visualizing donation density by geographic area — powerful for admin insights.</p>
+                <div style="margin-top:8px;"><span class="tag tag-blue">Data Viz</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">📲</div>
+                <h4>PWA Support</h4>
+                <p>Service worker + manifest for installable app with offline caching — works on low-end devices without app store.</p>
+                <div style="margin-top:8px;"><span class="tag tag-purple">Progressive</span></div>
+            </div>
+            <div class="card">
+                <div class="icon">⏱️</div>
+                <h4>Expiry Countdown</h4>
+                <p>Live countdown timers on every donation. Auto-archive listings past their food safety window to prevent waste.</p>
+                <div style="margin-top:8px;"><span class="tag tag-yellow">Automation</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 4: TECH STACK ==================== -->
+    <div class="page">
+        <div class="section-number">04 — Technology Stack</div>
+        <h2>Built with <span class="accent">Modern Tools</span></h2>
+        <p class="section-desc">Full-stack MERN architecture with real-time capabilities and geospatial intelligence.</p>
+
+        <h3>Core Stack</h3>
+        <div class="pills">
+            <div class="pill"><span class="dot dot-green"></span>MongoDB Atlas</div>
+            <div class="pill"><span class="dot dot-green"></span>Express.js</div>
+            <div class="pill"><span class="dot dot-blue"></span>React 18</div>
+            <div class="pill"><span class="dot dot-green"></span>Node.js</div>
+            <div class="pill"><span class="dot dot-purple"></span>Vite</div>
+        </div>
+
+        <h3>Real-time & Communication</h3>
+        <div class="pills">
+            <div class="pill"><span class="dot dot-yellow"></span>Socket.IO</div>
+            <div class="pill"><span class="dot dot-blue"></span>JWT Auth</div>
+            <div class="pill"><span class="dot dot-purple"></span>Multer (Uploads)</div>
+        </div>
+
+        <h3>Data Visualization & Maps</h3>
+        <div class="pills">
+            <div class="pill"><span class="dot dot-blue"></span>Recharts</div>
+            <div class="pill"><span class="dot dot-green"></span>Leaflet + React-Leaflet</div>
+            <div class="pill"><span class="dot dot-yellow"></span>Heatmap Layer</div>
+        </div>
+
+        <h3>Libraries & Utilities</h3>
+        <div class="pills">
+            <div class="pill"><span class="dot dot-purple"></span>react-i18next</div>
+            <div class="pill"><span class="dot dot-blue"></span>qrcode / qrcode.react</div>
+            <div class="pill"><span class="dot dot-green"></span>geolib</div>
+            <div class="pill"><span class="dot dot-yellow"></span>bcryptjs</div>
+            <div class="pill"><span class="dot dot-red"></span>express-validator</div>
+        </div>
+
+        <hr class="divider">
+
+        <h3>System Architecture</h3>
+        <div class="highlight-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Layer</th>
+                        <th>Technology</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Frontend</strong></td>
+                        <td>React + Vite</td>
+                        <td>SPA with role-based dashboards, maps, charts</td>
+                    </tr>
+                    <tr>
+                        <td><strong>API Server</strong></td>
+                        <td>Express + Socket.IO</td>
+                        <td>REST API + real-time event broadcasting</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Auth</strong></td>
+                        <td>JWT + bcrypt</td>
+                        <td>Stateless auth with role-based guards</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database</strong></td>
+                        <td>MongoDB Atlas</td>
+                        <td>Documents, geospatial queries (2dsphere)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>File Storage</strong></td>
+                        <td>Multer (local)</td>
+                        <td>Food photos for safety verification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Algorithms</strong></td>
+                        <td>Custom JS</td>
+                        <td>Forecasting, route optimization, matching</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 5: DATA MODELS ==================== -->
+    <div class="page">
+        <div class="section-number">05 — Data Models</div>
+        <h2>Database <span class="accent">Schema Design</span></h2>
+        <p class="section-desc">MongoDB document models with geospatial indexing and relational references.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Model</th>
+                    <th>Key Fields</th>
+                    <th>Special Features</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>User</strong></td>
+                    <td>name, email, password, role, phone, language, documents[], rating</td>
+                    <td><code>2dsphere</code> location index, points, badges[]</td>
+                </tr>
+                <tr>
+                    <td><strong>Donation</strong></td>
+                    <td>donor, foodType, quantity, preparedAt, expiresAt, status, photos[]</td>
+                    <td>qrCode, matchedShelter, freshnessBadge, handoverVerified</td>
+                </tr>
+                <tr>
+                    <td><strong>DemandForecast</strong></td>
+                    <td>donor, date, predictedSurplus, actualSurplus</td>
+                    <td>Time-series data for moving-average algo</td>
+                </tr>
+                <tr>
+                    <td><strong>Route</strong></td>
+                    <td>volunteer, waypoints[], optimizedOrder[], distance</td>
+                    <td>Nearest-neighbor optimized multi-stop</td>
+                </tr>
+                <tr>
+                    <td><strong>ImpactReport</strong></td>
+                    <td>period, totalMealsSaved, co2Avoided, donorBreakdown[]</td>
+                    <td>Aggregation pipeline results</td>
+                </tr>
+                <tr>
+                    <td><strong>Leaderboard</strong></td>
+                    <td>user, role, totalPoints, totalMeals, rank, badges[]</td>
+                    <td>Auto-updated on donation completion</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr class="divider">
+
+        <div class="section-number">06 — API Endpoints</div>
+        <h2>Backend <span class="accent">API Surface</span></h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Group</th>
+                    <th>Endpoints</th>
+                    <th>Auth</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Auth</strong></td>
+                    <td><code>POST /register</code> · <code>POST /login</code> · <code>GET /me</code></td>
+                    <td>Public / JWT</td>
+                </tr>
+                <tr>
+                    <td><strong>Donations</strong></td>
+                    <td><code>CRUD</code> · <code>/claim</code> · <code>/complete</code> · <code>/photo</code></td>
+                    <td>Donor / Vol</td>
+                </tr>
+                <tr>
+                    <td><strong>Forecast</strong></td>
+                    <td><code>GET /forecast/:donorId</code> — 7-day predictions</td>
+                    <td>NGO / Admin</td>
+                </tr>
+                <tr>
+                    <td><strong>Routes</strong></td>
+                    <td><code>POST /optimize</code> — multi-stop optimization</td>
+                    <td>Volunteer</td>
+                </tr>
+                <tr>
+                    <td><strong>Match</strong></td>
+                    <td><code>POST /match/:donationId</code> — geo + capacity match</td>
+                    <td>System</td>
+                </tr>
+                <tr>
+                    <td><strong>QR</strong></td>
+                    <td><code>GET /qr/:id</code> · <code>POST /qr/verify</code></td>
+                    <td>Vol / NGO</td>
+                </tr>
+                <tr>
+                    <td><strong>Leaderboard</strong></td>
+                    <td><code>GET /leaderboard?role=donor</code></td>
+                    <td>Public</td>
+                </tr>
+                <tr>
+                    <td><strong>Impact</strong></td>
+                    <td><code>GET /report?period=monthly</code></td>
+                    <td>Admin</td>
+                </tr>
+                <tr>
+                    <td><strong>Heatmap</strong></td>
+                    <td><code>GET /analytics/heatmap</code></td>
+                    <td>Admin</td>
+                </tr>
+                <tr>
+                    <td><strong>Geo</strong></td>
+                    <td><code>GET /nearby/volunteers?lat&lng&radius</code></td>
+                    <td>System</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== PAGE 6: USER ROLES & UI ==================== -->
+    <div class="page">
+        <div class="section-number">07 — User Roles & Dashboards</div>
+        <h2>Role-Based <span class="accent">Experience</span></h2>
+        <p class="section-desc">Four distinct user roles, each with a tailored dashboard and feature set.</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="icon">🏪</div>
+                <h4>Donor (Restaurant / Mess)</h4>
+                <ul style="margin-top:8px;">
+                    <li>Create surplus food listings</li>
+                    <li>Upload food photos</li>
+                    <li>View QR codes per donation</li>
+                    <li>Track donation history</li>
+                    <li>Earn points & badges</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="icon">🚗</div>
+                <h4>Volunteer</h4>
+                <ul style="margin-top:8px;">
+                    <li>See nearby available pickups</li>
+                    <li>View optimized multi-stop route</li>
+                    <li>Scan QR at pickup/delivery</li>
+                    <li>Earn points for completions</li>
+                    <li>Real-time proximity alerts</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="icon">🏠</div>
+                <h4>NGO / Shelter</h4>
+                <ul style="margin-top:8px;">
+                    <li>View incoming donations</li>
+                    <li>7-day demand forecast chart</li>
+                    <li>Verify delivery via QR scan</li>
+                    <li>Document upload for verification</li>
+                    <li>Rate donors & volunteers</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="icon">👑</div>
+                <h4>Admin</h4>
+                <ul style="margin-top:8px;">
+                    <li>Verify/reject NGO applications</li>
+                    <li>View impact reports & charts</li>
+                    <li>Interactive donation heatmap</li>
+                    <li>Manage all users & donations</li>
+                    <li>Export CSR data (CSV)</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-number">08 — UI Design Direction</div>
+        <h2>Visual <span class="accent">Identity</span></h2>
+
+        <div class="card-grid three">
+            <div class="card" style="text-align:center;">
+                <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#00b4d8);margin:0 auto 10px;"></div>
+                <h4>Color Palette</h4>
+                <p>Dark base (#0a0a0f), neon green (#00ff88), electric blue (#00b4d8)</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <div style="font-family:'Inter';font-size:24px;font-weight:800;margin-bottom:10px;color:#fff;">Aa</div>
+                <h4>Typography</h4>
+                <p>Inter for UI, JetBrains Mono for data & stats</p>
+            </div>
+            <div class="card" style="text-align:center;">
+                <div style="width:60px;height:40px;border-radius:12px;background:rgba(255,255,255,0.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.1);margin:10px auto;"></div>
+                <h4>Glassmorphism</h4>
+                <p>Frosted glass cards with blur, subtle borders, depth</p>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>✨ Design Principles</h4>
+            <ul>
+                <li><strong>Micro-animations</strong> — Hover scale, card entrance fade-up, counter spin-up, badge pulse</li>
+                <li><strong>Recharts</strong> — Forecast graphs, impact bar charts, pie breakdowns</li>
+                <li><strong>Leaflet Maps</strong> — Route visualization + heatmap overlay for admin analytics</li>
+                <li><strong>Real-time Toasts</strong> — Socket.IO powered live notification popups</li>
+                <li><strong>Mobile-first</strong> — Fully responsive design across all viewports</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 7: IMPACT & METRICS ==================== -->
+    <div class="page">
+        <div class="section-number">09 — Impact Metrics</div>
+        <h2>Measuring <span class="accent">Real Impact</span></h2>
+        <p class="section-desc">Auto-generated reports that donors can use for CSR filings and tax documentation.</p>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="stat-value">🍽️</div>
+                <div class="stat-label">Meals Saved</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">🌍</div>
+                <div class="stat-label">CO₂ Avoided (kg)</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">🏪</div>
+                <div class="stat-label">Active Donors</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value">🏠</div>
+                <div class="stat-label">Shelters Served</div>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <h4>📊 Report Features</h4>
+            <ul>
+                <li><strong>Monthly aggregation</strong> — Auto-calculated from completed donations</li>
+                <li><strong>Per-donor breakdown</strong> — Individual contribution metrics for each donor</li>
+                <li><strong>CO₂ calculation</strong> — Based on food weight × emission factor (~2.5 kg CO₂/kg food waste avoided)</li>
+                <li><strong>CSV export</strong> — One-click download for CSR and tax documentation</li>
+                <li><strong>Visual charts</strong> — Trend lines, bar charts, and pie breakdowns via Recharts</li>
+            </ul>
+        </div>
+
+        <hr class="divider">
+
+        <div class="section-number">10 — Scalability & Future Roadmap</div>
+        <h2>Beyond the <span class="accent">Hackathon</span></h2>
+
+        <div class="card-grid">
+            <div class="card">
+                <div class="icon">🤖</div>
+                <h4>ML-Powered Forecasting</h4>
+                <p>Replace moving-average with LSTM/Prophet for more accurate surplus predictions.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📡</div>
+                <h4>IoT Temperature Sensors</h4>
+                <p>Real-time cold chain monitoring with BLE sensors during transport.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🔗</div>
+                <h4>Blockchain Audit Trail</h4>
+                <p>Immutable donation lifecycle logs for full transparency and trust.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📱</div>
+                <h4>Native Mobile App</h4>
+                <p>React Native app with push notifications, camera QR scanning, and offline mode.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PAGE 8: DEMO FLOW ==================== -->
+    <div class="page">
+        <div class="section-number">11 — Demo Flow</div>
+        <h2>Live <span class="accent">Walkthrough</span></h2>
+        <p class="section-desc">Step-by-step demonstration path for the hackathon presentation.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Action</th>
+                    <th>What Judges See</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1</strong></td>
+                    <td>Open Landing Page</td>
+                    <td>Dark themed hero with animated stats counters</td>
+                </tr>
+                <tr>
+                    <td><strong>2</strong></td>
+                    <td>Register as Donor</td>
+                    <td>Role selection, geo-permission prompt</td>
+                </tr>
+                <tr>
+                    <td><strong>3</strong></td>
+                    <td>Create Surplus Listing</td>
+                    <td>Food form + photo upload → QR code generated ✅</td>
+                </tr>
+                <tr>
+                    <td><strong>4</strong></td>
+                    <td>Switch to Volunteer tab</td>
+                    <td>🔔 Real-time toast notification appears instantly</td>
+                </tr>
+                <tr>
+                    <td><strong>5</strong></td>
+                    <td>View Optimized Route</td>
+                    <td>Leaflet map with multi-stop optimized path</td>
+                </tr>
+                <tr>
+                    <td><strong>6</strong></td>
+                    <td>Scan QR at Pickup</td>
+                    <td>Chain of custody verified ✅</td>
+                </tr>
+                <tr>
+                    <td><strong>7</strong></td>
+                    <td>Switch to NGO Dashboard</td>
+                    <td>Incoming donation + 7-day forecast chart</td>
+                </tr>
+                <tr>
+                    <td><strong>8</strong></td>
+                    <td>Verify Delivery QR</td>
+                    <td>Handover confirmed, freshness badge shown</td>
+                </tr>
+                <tr>
+                    <td><strong>9</strong></td>
+                    <td>Open Admin Panel</td>
+                    <td>Impact report charts + donation heatmap 🔥</td>
+                </tr>
+                <tr>
+                    <td><strong>10</strong></td>
+                    <td>Open Leaderboard</td>
+                    <td>Ranked donors/volunteers with achievement badges 🏆</td>
+                </tr>
+                <tr>
+                    <td><strong>11</strong></td>
+                    <td>Switch Language → Hindi</td>
+                    <td>Entire UI switches to Hindi instantly 🌐</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="highlight-box" style="text-align:center; margin-top:30px;">
+            <h4>🚀 Ready to Build</h4>
+            <p style="color:var(--text); font-size:15px; margin-top:8px;">
+                Full-stack MERN · Real-time Socket.IO · QR Verification · Smart Matching · Gamification · Geo-Alerts · Heatmaps · PWA · i18n
+            </p>
+        </div>
+
+        <div class="page-footer">
+            FoodBridge · Track 1: Zero Hunger · Hackathon 2026 · Built with MERN Stack + MongoDB Atlas
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+:root {
+  --green: #00ff88;
+  --green-glow: rgba(0, 255, 136, 0.3);
+  --blue: #00b4d8;
+  --dark: #0a0a0f;
+  --card: #12121a;
+  --card-hover: #1a1a24;
+  --border: #1e1e2e;
+  --text: #e0e0e0;
+  --muted: #888;
+  --warning: #ffc800;
+  --danger: #ff4466;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--dark);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  color: #fff;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: var(--green-glow);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.05);
+}
+
+/* Inputs & Buttons */
+.input-field {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--green);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00d270, #00b4d8);
+  color: var(--dark);
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--green);
+  border: 1px solid var(--green);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  background: rgba(0, 255, 136, 0.1);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-fresh { background: rgba(0, 255, 136, 0.15); color: var(--green); border: 1px solid rgba(0, 255, 136, 0.3); }
+.badge-caution { background: rgba(255, 200, 0, 0.15); color: var(--warning); border: 1px solid rgba(255, 200, 0, 0.3); }
+.badge-expired { background: rgba(255, 68, 102, 0.15); color: var(--danger); border: 1px solid rgba(255, 68, 102, 0.3); }
+.badge-blue { background: rgba(0, 180, 216, 0.15); color: var(--blue); border: 1px solid rgba(0, 180, 216, 0.3); }
+
+/* Layout Utilities */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.page-wrapper {
+  padding-top: 80px;
+  min-height: 100vh;
+}
+
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+
+/* Leaflet Map Overrides for Dark Theme */
+.leaflet-container {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #1a1a24;
+}
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}

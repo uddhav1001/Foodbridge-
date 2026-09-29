@@ -1,0 +1,230 @@
+# FoodBridge — Smart Surplus Food Redistribution Platform (Final Plan)
+
+A hackathon-ready MERN stack app for **Track 1: Zero Hunger** that connects food donors (messes, restaurants) with NGO shelters through verified volunteers — featuring demand forecasting, route optimization, food safety checks, impact reporting, multilingual access, and several **advanced concepts** to stand out.
+
+---
+
+## Advanced Concepts Added
+
+| # | Concept | Why It Stands Out |
+|---|---------|-------------------|
+| 1 | **Real-time with Socket.IO** | Live push notifications when donations are created, claimed, picked, delivered — no page refresh needed |
+| 2 | **QR Code Handover Verification** | Generate unique QR per donation; volunteer scans at pickup, shelter scans at delivery — tamper-proof chain of custody |
+| 3 | **Smart Matching Algorithm** | Auto-match surplus to nearest shelter by proximity, capacity, and dietary compatibility — not just manual claiming |
+| 4 | **Gamification & Leaderboard** | Points, badges (First Donation, 100 Meals Saved, Speed Demon), and donor/volunteer leaderboards to drive engagement |
+| 5 | **Geolocation Proximity Alerts** | When a new donation is posted, auto-notify volunteers within a configurable radius using geo queries |
+| 6 | **Interactive Analytics Heatmap** | Leaflet heatmap showing donation density by area — visually impressive for demo |
+| 7 | **PWA Support** | Service worker + manifest for installable app with offline caching — works on low-end devices |
+| 8 | **Expiry Countdown & Auto-Archive** | Real-time countdown timers on donations, auto-expire listings past their safety window |
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **MongoDB Atlas**: Provide your connection string. I'll use `MONGO_URI` placeholder in `.env`.
+
+> [!IMPORTANT]
+> **Hackathon Scope**: SMS alerts → console-logged, forecasting → moving-average, route optimization → nearest-neighbor, food classification → rule-based from photo metadata. All demo-ready, upgradeable later.
+
+---
+
+## Proposed Changes
+
+### Backend (Express + MongoDB Atlas + Socket.IO)
+
+#### [NEW] [package.json](file:///c:/FoodBridge/backend/package.json)
+Dependencies: `express`, `mongoose`, `cors`, `dotenv`, `bcryptjs`, `jsonwebtoken`, `multer`, `express-validator`, `socket.io`, `qrcode`, `geolib`
+
+#### [NEW] [.env](file:///c:/FoodBridge/backend/.env)
+`MONGO_URI`, `JWT_SECRET`, `PORT=5000`
+
+#### [NEW] [server.js](file:///c:/FoodBridge/backend/server.js)
+Express + HTTP server + Socket.IO init, MongoDB connect, CORS, route mounting, real-time event broadcasting
+
+#### [NEW] [config/db.js](file:///c:/FoodBridge/backend/config/db.js)
+Mongoose connection helper with retry logic
+
+---
+
+#### Models (`models/`)
+
+| File | Key Fields |
+|------|------------|
+| `User.js` | name, email, password, role (`donor`/`volunteer`/`ngo`/`admin`), phone, language, verified, documents[], rating, **points, badges[], location {type: Point, coordinates}** |
+| `Donation.js` | donor ref, foodType, quantity, preparedAt, expiresAt, status, photos[], freshnessBadge, **qrCode, matchedShelter ref, handoverVerified, expiryCountdown** |
+| `DemandForecast.js` | donor ref, date, predictedSurplus, actualSurplus |
+| `Route.js` | volunteer ref, waypoints[], optimizedOrder[], distance, estimatedTime |
+| `ImpactReport.js` | period, totalMealsSaved, co2Avoided, donorBreakdown[] |
+| **[NEW]** `Leaderboard.js` | user ref, role, totalPoints, totalMeals, rank, badges[] |
+
+> [!NOTE]
+> `User.location` uses MongoDB `2dsphere` index for geo-proximity queries (find volunteers near a donation).
+
+---
+
+#### Routes & Controllers
+
+| Route Group | Key Endpoints |
+|-------------|---------------|
+| **Auth** | `POST /register`, `POST /login`, `GET /me` |
+| **Users** | `GET /ngos`, `PATCH /:id/verify`, `PATCH /:id/rate` |
+| **Donations** | Full CRUD + `PATCH /claim` + `PATCH /complete` + `POST /photo` |
+| **Forecast** | `GET /forecast/:donorId` — 7-day moving-average prediction |
+| **Routes** | `POST /optimize` — nearest-neighbor optimized multi-stop |
+| **Impact** | `GET /report?period=monthly` — meals, CO2, per-donor stats |
+| **Alerts** | `POST /send` — simulated multilingual SMS |
+| **[NEW] Match** | `POST /api/match/:donationId` — auto-find best shelter by proximity + capacity |
+| **[NEW] QR** | `GET /api/qr/:donationId` — generate QR, `POST /api/qr/verify` — scan & verify handover |
+| **[NEW] Leaderboard** | `GET /api/leaderboard?role=donor` — ranked list with badges |
+| **[NEW] Geo** | `GET /api/nearby/volunteers?lat=x&lng=y&radius=5` — find nearby volunteers |
+| **[NEW] Heatmap** | `GET /api/analytics/heatmap` — donation coordinates with intensity for map overlay |
+
+#### Middleware
+- `auth.js` — JWT + role guards
+- `upload.js` — Multer for photos
+- **`socket.js`** — Socket.IO event emitter helper (broadcast `new-donation`, `donation-claimed`, `donation-delivered`)
+- **`expiry.js`** — Cron-style checker to auto-archive expired donations
+
+---
+
+### Frontend (React + Vite + Socket.IO Client)
+
+#### Additional dependencies
+`socket.io-client`, `qrcode.react`, `react-leaflet-heatmap-layer-v3`, `leaflet-routing-machine`, `react-i18next`, `i18next`, `recharts`, `react-icons`, `react-hot-toast`, `react-countup`
+
+#### App Structure
+
+```
+src/
+├── main.jsx
+├── App.jsx
+├── index.css                    # Dark theme, neon accents, glassmorphism
+├── api/axios.js                 # Axios + token interceptor
+├── socket.js                    # Socket.IO client singleton
+├── context/AuthContext.jsx
+├── components/
+│   ├── Navbar.jsx
+│   ├── Sidebar.jsx
+│   ├── ProtectedRoute.jsx
+│   ├── StatsCard.jsx            # Animated counter cards
+│   ├── FreshnessBar.jsx         # Color-coded freshness indicator
+│   ├── ExpiryCountdown.jsx      # ⏱ Live countdown timer
+│   ├── QRCodeDisplay.jsx        # QR generation for handover
+│   ├── BadgeDisplay.jsx         # Achievement badges grid
+│   ├── LeaderboardTable.jsx     # Ranked table with animations
+│   ├── NotificationToast.jsx    # Real-time Socket.IO toasts
+│   └── LanguageSwitcher.jsx
+├── pages/
+│   ├── Landing.jsx              # Hero + features + stats counter
+│   ├── Login.jsx
+│   ├── Register.jsx             # Role selector + geo permission
+│   ├── donor/
+│   │   ├── DonorDashboard.jsx   # Stats + recent donations + points
+│   │   └── CreateDonation.jsx   # Form + photo upload + QR generated
+│   ├── volunteer/
+│   │   ├── VolunteerDashboard.jsx  # Nearby pickups + QR scanner
+│   │   └── RouteMap.jsx         # Leaflet map with optimized route
+│   ├── ngo/
+│   │   ├── NgoDashboard.jsx     # Incoming + forecast + verify QR
+│   │   └── ForecastChart.jsx    # Recharts 7-day prediction
+│   ├── admin/
+│   │   ├── AdminDashboard.jsx   # Overview stats + pending verifications
+│   │   ├── VerifyNgos.jsx       # Document review + approve/reject
+│   │   ├── ImpactReport.jsx     # Charts + downloadable CSV
+│   │   └── HeatmapView.jsx     # Leaflet heatmap of donation density
+│   └── Leaderboard.jsx         # Global leaderboard with tabs
+└── i18n/
+    ├── en.json
+    ├── hi.json
+    └── i18n.js
+```
+
+#### UI Design Direction
+- **Dark theme** base (`#0a0a0f`) with neon green (`#00ff88`) and electric blue (`#00b4d8`) gradients
+- **Glassmorphism** cards with `backdrop-filter: blur`
+- **Micro-animations**: hover scale, card entrance fade-up, counter spin-up, badge pulse
+- **Typography**: Inter (UI) + JetBrains Mono (data/stats)
+- **Recharts** for forecast/impact visualizations
+- **Leaflet** for route maps + heatmap layer
+- **Real-time toasts** for live donation events
+- Fully responsive, mobile-first
+
+---
+
+## Architecture Diagram
+
+```mermaid
+graph TB
+    subgraph Frontend["React + Vite (Port 5173)"]
+        LP[Landing Page]
+        AUTH[Auth Pages]
+        DD[Donor Dashboard]
+        VD[Volunteer Dashboard]
+        ND[NGO Dashboard]
+        AD[Admin Dashboard]
+        LB[Leaderboard]
+    end
+
+    subgraph Backend["Express + Socket.IO (Port 5000)"]
+        API[REST APIs]
+        WS[WebSocket Events]
+        MW[Middleware - Auth/Upload]
+        MATCH[Smart Matching Engine]
+        FORECAST[Demand Forecaster]
+        ROUTE[Route Optimizer]
+        QR[QR Generator/Verifier]
+        GEO[Geo Proximity Engine]
+    end
+
+    subgraph DB["MongoDB Atlas"]
+        Users[(Users + 2dsphere)]
+        Donations[(Donations)]
+        Forecasts[(Forecasts)]
+        Impact[(Impact Reports)]
+        Leaders[(Leaderboard)]
+    end
+
+    Frontend -->|HTTP + WS| Backend
+    Backend --> DB
+    WS -->|Real-time| Frontend
+```
+
+---
+
+## Verification Plan
+
+### Automated (CLI + Browser)
+1. Backend health: `curl localhost:5000/api/auth/me` → 401
+2. Register → Login → JWT returned
+3. Donation CRUD: create → list → claim → complete
+4. QR: generate for donation → verify scan
+5. Forecast: seed data → GET predictions → values returned
+6. Route: POST waypoints → optimized order returned
+7. Match: POST match → nearest shelter selected
+8. Leaderboard: create donations → points increment → rank updates
+9. Heatmap: GET heatmap data → coordinate array returned
+
+### Manual (Browser Demo Flow)
+1. Landing page → dark theme with animated counters
+2. Register as Donor → create listing → QR code generated → real-time toast fires
+3. Register as Volunteer → see nearby pickups → view optimized route on map → scan QR
+4. Register as NGO → see incoming donations → view 7-day forecast chart → verify delivery QR
+5. Register as Admin → verify NGO documents → view impact report with charts → view heatmap
+6. Open Leaderboard → see ranked donors & volunteers with badges
+7. Switch language → Hindi → all UI text updates
+8. Test on mobile viewport → responsive layout works
+
+---
+
+## Build Order
+1. Backend setup → DB connection → Models (with geo indexes)
+2. Auth routes + JWT middleware
+3. Donation CRUD + QR generation + Socket.IO events
+4. Forecast, Route Optimizer, Smart Matching, Geo queries, Leaderboard APIs
+5. Impact reporting + Heatmap data endpoint
+6. Frontend scaffold → theme → routing → auth context
+7. Auth pages → Landing page
+8. Role-based dashboards + all feature pages
+9. Real-time Socket.IO integration + QR components
+10. i18n, PWA manifest, polish & responsiveness
