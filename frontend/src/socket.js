@@ -4,7 +4,8 @@ let socket = null;
 
 export const initSocket = (token) => {
     if (!socket) {
-        socket = io('http://localhost:5000', {
+        const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+        socket = io(BACKEND_URL, {
             auth: { token }
         });
 
