@@ -24,7 +24,8 @@ const Register = () => {
             toast.success('Registration successful!');
             navigate(`/${user.role}-dashboard`);
         } catch (err) {
-            toast.error('Registration failed. Email might exist.');
+            const msg = err?.response?.data?.message || err?.response?.data?.errors?.[0]?.msg || 'Registration failed. Please try again.';
+            toast.error(msg);
         }
     };
 
