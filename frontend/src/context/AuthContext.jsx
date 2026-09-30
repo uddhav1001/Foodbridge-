@@ -17,8 +17,10 @@ export const AuthProvider = ({ children }) => {
                 try {
                     const { data } = await api.get('/auth/me');
                     setUser(data);
-                    const socket = initSocket(token);
-                    socket.emit('join-role', data.role);
+                    try {
+                        const socket = initSocket(token);
+                        socket.emit('join-role', data.role);
+                    } catch (e) { /* socket is optional */ }
                 } catch (error) {
                     localStorage.removeItem('token');
                     setUser(null);
@@ -33,8 +35,10 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.post('/auth/login', { email, password });
         localStorage.setItem('token', data.token);
         setUser(data);
-        const socket = initSocket(data.token);
-        socket.emit('join-role', data.role);
+        try {
+            const socket = initSocket(data.token);
+            socket.emit('join-role', data.role);
+        } catch (e) { /* socket is optional */ }
         return data;
     };
 
@@ -42,15 +46,17 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.post('/auth/register', userData);
         localStorage.setItem('token', data.token);
         setUser(data);
-        const socket = initSocket(data.token);
-        socket.emit('join-role', data.role);
+        try {
+            const socket = initSocket(data.token);
+            socket.emit('join-role', data.role);
+        } catch (e) { /* socket is optional */ }
         return data;
     };
 
     const logout = () => {
         localStorage.removeItem('token');
         setUser(null);
-        disconnectSocket();
+        try { disconnectSocket(); } catch (e) { /* ignore */ }
     };
 
     return (

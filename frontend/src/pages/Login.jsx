@@ -8,18 +8,28 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return;
+        setSubmitting(true);
         try {
             const user = await login(email, password);
             toast.success('Login successful!');
             navigate(`/${user.role}-dashboard`);
         } catch (err) {
-            toast.error('Invalid credentials');
+            let msg = 'Invalid credentials';
+            if (err?.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err?.code === 'ERR_NETWORK') {
+                msg = 'Cannot reach server. Check your internet connection.';
+            }
+            toast.error(msg);
         }
+        setSubmitting(false);
     };
 
     return (
@@ -52,8 +62,8 @@ const Login = () => {
                             {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                         </button>
                     </div>
-                    <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }}>
-                        Log In
+                    <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }} disabled={submitting}>
+                        {submitting ? '⏳ Logging in...' : 'Log In'}
                     </button>
                 </form>
                 <p style={{ marginTop: '20px', color: 'var(--muted)', fontSize: '14px' }}>

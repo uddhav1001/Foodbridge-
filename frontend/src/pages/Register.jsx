@@ -7,26 +7,45 @@ import { toast } from 'react-hot-toast';
 const Register = () => {
     const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'donor' });
     const [showPassword, setShowPassword] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
     const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (submitting) return; // prevent double-tap on mobile
+        setSubmitting(true);
+
         try {
-            // Simulate asking for location if volunteer
-            let location = { type: 'Point', coordinates: [0, 0] };
-            if (formData.role === 'volunteer' || formData.role === 'ngo' || formData.role === 'donor') {
-                // Just mock a coordinate near India for hackathon demo
-                location.coordinates = [77.1025, 28.7041]; // Delhi avg
+            let location = { type: 'Point', coordinates: [77.1025, 28.7041] };
+
+            // Try getting real GPS on mobile
+            if (navigator.geolocation) {
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    location.coordinates = [pos.coords.longitude, pos.coords.latitude];
+                } catch (e) {
+                    // GPS denied or unavailable, use default Delhi coords
+                }
             }
 
             const user = await register({ ...formData, location });
-            toast.success('Registration successful!');
+            toast.success('🎉 Registration successful!');
             navigate(`/${user.role}-dashboard`);
         } catch (err) {
-            const msg = err?.response?.data?.message || err?.response?.data?.errors?.[0]?.msg || 'Registration failed. Please try again.';
+            let msg = 'Registration failed. Please try again.';
+            if (err?.response?.data?.message) {
+                msg = err.response.data.message;
+            } else if (err?.response?.data?.errors?.[0]?.msg) {
+                msg = err.response.data.errors[0].msg;
+            } else if (err?.code === 'ERR_NETWORK') {
+                msg = 'Cannot reach server. Check your internet connection.';
+            }
             toast.error(msg);
         }
+        setSubmitting(false);
     };
 
     return (
@@ -39,7 +58,7 @@ const Register = () => {
                     <input type="email" placeholder="Email Address" required className="input-field"
                         value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
                     <div style={{ position: 'relative' }}>
-                        <input type={showPassword ? "text" : "password"} placeholder="Password" required className="input-field"
+                        <input type={showPassword ? "text" : "password"} placeholder="Password (min 6 chars)" required minLength={6} className="input-field"
                             value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                         <button
                             type="button"
@@ -62,7 +81,9 @@ const Register = () => {
                         <option value="admin" style={{ color: '#000' }}>System Admin</option>
                     </select>
 
-                    <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }}>Sign Up</button>
+                    <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '16px' }} disabled={submitting}>
+                        {submitting ? '⏳ Creating Account...' : 'Sign Up'}
+                    </button>
                 </form>
                 <p style={{ marginTop: '20px', color: 'var(--muted)', fontSize: '14px' }}>
                     Already have an account? <Link to="/login" style={{ color: 'var(--green)' }}>Log in</Link>
