@@ -10,6 +10,7 @@
   --muted: #888;
   --warning: #ffc800;
   --danger: #ff4466;
+  --nav-height: 70px;
 }
 
 * {
@@ -24,6 +25,8 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  /* Prevent pull-to-refresh on mobile for app feel */
+  overscroll-behavior-y: none;
 }
 
 h1,
@@ -54,12 +57,6 @@ h4 {
   transition: all 0.3s ease;
 }
 
-.glass-card:hover {
-  border-color: var(--green-glow);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.05);
-}
-
 /* Inputs & Buttons */
 .input-field {
   width: 100%;
@@ -70,6 +67,7 @@ h4 {
   border-radius: 8px;
   font-family: inherit;
   font-size: 16px;
+  /* Prevents iOS auto-zoom */
   transition: border-color 0.2s;
   margin-bottom: 16px;
 }
@@ -88,19 +86,7 @@ h4 {
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
   box-shadow: 0 4px 15px rgba(0, 255, 136, 0.2);
-}
-
-.btn-primary:hover {
-  transform: scale(1.02);
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .btn-outline {
@@ -112,11 +98,6 @@ h4 {
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-outline:hover {
-  background: rgba(0, 255, 136, 0.1);
 }
 
 /* Badges */
@@ -128,7 +109,6 @@ h4 {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .badge-fresh {
@@ -143,18 +123,6 @@ h4 {
   border: 1px solid rgba(255, 200, 0, 0.3);
 }
 
-.badge-expired {
-  background: rgba(255, 68, 102, 0.15);
-  color: var(--danger);
-  border: 1px solid rgba(255, 68, 102, 0.3);
-}
-
-.badge-blue {
-  background: rgba(0, 180, 216, 0.15);
-  color: var(--blue);
-  border: 1px solid rgba(0, 180, 216, 0.3);
-}
-
 /* Layout */
 .container {
   max-width: 1200px;
@@ -163,7 +131,7 @@ h4 {
 }
 
 .page-wrapper {
-  padding-top: 80px;
+  padding-top: var(--nav-height);
   min-height: 100vh;
   padding-bottom: 40px;
 }
@@ -186,57 +154,81 @@ h4 {
   gap: 20px;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* Desktop Top Nav */
+.desktop-nav {
+  display: block;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--dark);
+/* Mobile Bottom Nav Hidden on Desktop */
+.mobile-bottom-nav {
+  display: none;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-/* Table responsive */
-table {
-  font-size: 14px;
-}
-
-/* Leaflet Dark Theme */
+/* Leaflet Map */
 .leaflet-container {
   border-radius: 12px;
   border: 1px solid var(--border);
   background: #1a1a24;
 }
 
-.leaflet-layer,
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out,
-.leaflet-control-attribution {
+.leaflet-layer {
   filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
 }
 
-/* ========= MOBILE RESPONSIVE ========= */
-
-/* Tablets */
-@media (max-width: 1024px) {
-  .grid-4 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-/* Mobile */
+/* ========= TRUE MOBILE APP EXPERIENCE ========= */
 @media (max-width: 768px) {
+
+  /* Hide Desktop Nav Header completely on mobile */
+  .desktop-nav {
+    display: none;
+  }
+
+  /* Remove top padding since top nav is gone, add bottom padding for bottom tab bar */
+  .page-wrapper {
+    padding-top: 20px;
+    padding-bottom: calc(var(--nav-height) + 30px) !important;
+  }
+
+  /* Show Bottom Tab Bar */
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: var(--nav-height);
+    background: rgba(10, 10, 15, 0.95);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border);
+    z-index: 999;
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Fix for iOS Home bar */
+  }
+
+  .bottom-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 500;
+    width: 100%;
+    height: 100%;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+
+  .bottom-tab.active {
+    color: var(--green);
+  }
+
+  /* Mobile grids */
   .container {
     padding: 0 12px;
-  }
-
-  .page-wrapper {
-    padding-top: 70px;
-    padding-bottom: 24px;
   }
 
   h1 {
@@ -245,10 +237,6 @@ table {
 
   h2 {
     font-size: 22px !important;
-  }
-
-  h3 {
-    font-size: 18px !important;
   }
 
   .grid-2,
@@ -263,53 +251,15 @@ table {
     border-radius: 12px;
   }
 
-  .glass-card:hover {
-    transform: none;
-  }
-
   .btn-primary,
   .btn-outline {
-    padding: 10px 18px;
-    font-size: 14px;
     width: 100%;
     text-align: center;
-  }
-
-  table {
-    font-size: 12px;
-  }
-
-  table th,
-  table td {
-    padding: 10px 8px !important;
-  }
-
-  /* Hide nav links on mobile, show hamburger */
-  .nav-links {
-    display: none !important;
-  }
-
-  .nav-links.open {
-    display: flex !important;
-    flex-direction: column;
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background: rgba(10, 10, 15, 0.98);
-    border-bottom: 1px solid var(--border);
-    padding: 16px;
-    gap: 16px;
-    z-index: 200;
-    align-items: center;
-  }
-
-  .hamburger {
-    display: flex !important;
+    font-size: 15px;
+    padding: 14px;
   }
 }
 
-/* Small phones */
 @media (max-width: 480px) {
   h1 {
     font-size: 26px !important;
@@ -320,11 +270,8 @@ table {
     font-size: 20px !important;
   }
 
-  .glass-card {
-    padding: 14px;
-  }
-
   .input-field {
-    padding: 10px 12px;
+    padding: 12px;
+    font-size: 16px;
   }
 }
